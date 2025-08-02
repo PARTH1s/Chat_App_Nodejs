@@ -9,13 +9,10 @@ const io = socketio(server);
 io.on('connection', (socket) => {
     console.log("User Connected", socket.id);
 
-    socket.on('from_client',()=> {
-        console.log('Event coming from client');
+    socket.on('msg_send',(data)=> {
+        console.log(data);
+        io.emit('msg_rcvd',data);
     })
-
-    setInterval(() => {
-        socket.emit('from_server');
-    }, 2000);
 })
 
 const PORT = 3000
