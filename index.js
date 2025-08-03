@@ -10,20 +10,27 @@ const io = socketio(server);
 io.on('connection', (socket) => {
     console.log("User Connected:", socket.id);
 
-    // Join room when user sends room info
     socket.on('join_room', (roomid) => {
         socket.join(roomid);
         console.log(`Socket ${socket.id} joined room ${roomid}`);
     });
 
-    // Send message only to specific room
     socket.on('msg_send', (data) => {
         io.to(data.roomid).emit('msg_rcvd', {
             msg: data.msg,
             username: data.username
         });
     });
+
+    socket.on('typing', (data) => {
+        socket.to(data.roomid).emit('user_typing', { username: data.username });
+    });
+
+    socket.on('stop_typing', (data) => {
+        socket.to(data.roomid).emit('user_stop_typing', { username: data.username });
+    });
 });
+
 
 const PORT = 3000;
 app.use('/', express.static(__dirname + '/public'));

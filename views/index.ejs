@@ -10,6 +10,7 @@
     <input type="text" id="username" placeholder="Your Name..." autocomplete="off" />
     <input type="text" id="newmsg" placeholder="Your Message..." autocomplete="off" />
     <button id="btn">Send</button>
+    <p id="typingStatus" style="color:gray;"></p>
     <ul id="msglist"></ul>
 
     <script src="/socket.io/socket.io.js"></script>
@@ -19,10 +20,10 @@
         const inputmsg = document.getElementById("newmsg");
         const username = document.getElementById("username");
         const msglist = document.getElementById("msglist");
+        const typingStatus = document.getElementById("typingStatus");
 
         const roomid = "<%= roomid %>";
 
-        // Join the room
         socket.emit("join_room", roomid);
 
         btn.onclick = function () {
@@ -32,12 +33,29 @@
                 roomid: roomid
             });
             inputmsg.value = "";
+            socket.emit('stop_typing', { username: username.value, roomid: roomid });
         };
+
+        inputmsg.addEventListener("input", () => {
+            if (inputmsg.value.length > 0) {
+                socket.emit('typing', { username: username.value || "Anonymous", roomid: roomid });
+            } else {
+                socket.emit('stop_typing', { username: username.value || "Anonymous", roomid: roomid });
+            }
+        });
 
         socket.on("msg_rcvd", (data) => {
             const limsg = document.createElement("li");
             limsg.innerText = `${data.username}: ${data.msg}`;
             msglist.appendChild(limsg);
+        });
+
+        socket.on('user_typing', (data) => {
+            typingStatus.innerText = `${data.username} is typing...`;
+        });
+
+        socket.on('user_stop_typing', () => {
+            typingStatus.innerText = "";
         });
     </script>
 </body>
