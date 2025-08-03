@@ -1,8 +1,7 @@
 var socket = io();
 
-let btn = document.getElementById('btn');
 // btn.onclick = function exec() {
-//     socket.emit('from_client');
+    //     socket.emit('from_client');
 // }
 
 
@@ -13,6 +12,7 @@ let btn = document.getElementById('btn');
 //     document.body.appendChild(div);
 // });
 
+let btn = document.getElementById('btn');
 let inputmsg = document.getElementById('newmsg');
 let msglist=document.getElementById('msglist');
 

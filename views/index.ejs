@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chat Room</title>
+</head>
+<body>
+    <h1>Chat Room: <%= roomid %></h1>
+    <input type="text" id="username" placeholder="Your Name..." autocomplete="off" />
+    <input type="text" id="newmsg" placeholder="Your Message..." autocomplete="off" />
+    <button id="btn">Send</button>
+    <ul id="msglist"></ul>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        const btn = document.getElementById("btn");
+        const inputmsg = document.getElementById("newmsg");
+        const username = document.getElementById("username");
+        const msglist = document.getElementById("msglist");
+
+        const roomid = "<%= roomid %>";
+
+        // Join the room
+        socket.emit("join_room", roomid);
+
+        btn.onclick = function () {
+            socket.emit("msg_send", {
+                msg: inputmsg.value,
+                username: username.value || "Anonymous",
+                roomid: roomid
+            });
+            inputmsg.value = "";
+        };
+
+        socket.on("msg_rcvd", (data) => {
+            const limsg = document.createElement("li");
+            limsg.innerText = `${data.username}: ${data.msg}`;
+            msglist.appendChild(limsg);
+        });
+    </script>
+</body>
+</html>
