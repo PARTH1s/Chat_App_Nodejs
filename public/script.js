@@ -1,29 +1,22 @@
-var socket = io();
+const socket = io();
 
-// btn.onclick = function exec() {
-    //     socket.emit('from_client');
-// }
+const btn = document.getElementById('btn');
+const inputMsg = document.getElementById('newmsg');
+const msgList = document.getElementById('msglist');
 
+// Send message to server on button click
+btn.onclick = () => {
+    if (inputMsg.value.trim()) {
+        socket.emit('msg_send', {
+            msg: inputMsg.value.trim()
+        });
+        inputMsg.value = '';  
+    }
+};
 
-// socket.on('from_server', () => {  
-//     console.log("Collected a new event from server");
-//     const div = document.createElement('div');
-//     div.innerChild = 'New event from server';  
-//     document.body.appendChild(div);
-// });
-
-let btn = document.getElementById('btn');
-let inputmsg = document.getElementById('newmsg');
-let msglist=document.getElementById('msglist');
-
-btn.onclick = function exec(){
-    socket.emit('msg_send',{
-        msg: inputmsg.value
-     });
-}
-
-socket.on('msg_rcvd',(data)=>{
-    let limsg = document.createElement('li');
-    limsg.innerText = data.msg;
-    msglist.appendChild(limsg);
-})
+// Listen for messages from server and append to message list
+socket.on('msg_rcvd', (data) => {
+    const liMsg = document.createElement('li');
+    liMsg.innerText = data.msg;
+    msgList.appendChild(liMsg);
+});
